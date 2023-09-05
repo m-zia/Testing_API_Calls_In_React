@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const StarWarsPeople = () => {
     const [firstPerson, setFirstPerson] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         axios.get('https://swapi.dev/api/people/')
@@ -11,13 +12,22 @@ const StarWarsPeople = () => {
                 setFirstPerson(firstPersonName);
             })
             .catch(error => {
-                console.log(error);
+                if (error.response) {
+                    if (error.response.status === 500) {
+                        setErrorMessage("Oops... something went wrong, try again 🤕");
+                    } else if (error.response.status === 418) {
+                        setErrorMessage("418 I'm a tea pot 🫖, silly");
+                    }
+                } else {
+                    console.log('Error', error.message);
+                    setErrorMessage("Oops... something went wrong, try again 🤕");
+                }
             });
     }, []);
 
     return (
         <div>
-            <h1>{firstPerson}</h1>
+            {errorMessage ? (<h1>{errorMessage}</h1>) : (<h1>{firstPerson}</h1>)}
         </div>
     );
 };
